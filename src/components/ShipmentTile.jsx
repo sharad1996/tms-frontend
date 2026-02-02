@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { classNames } from '../lib/classNames.js';
 
-export function ShipmentTile({ shipment, onSelect, toggleFlag, deleteShipment, canDelete }) {
+export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, toggleFlag, canDelete }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const stop = (e) => e.stopPropagation();
@@ -33,6 +33,18 @@ export function ShipmentTile({ shipment, onSelect, toggleFlag, deleteShipment, c
               >
                 View details
               </button>
+              {onEdit && (
+                <button
+                  type="button"
+                  className="action-menu-item"
+                  onClick={() => {
+                    onEdit();
+                    setMenuOpen(false);
+                  }}
+                >
+                  Edit
+                </button>
+              )}
               <button
                 type="button"
                 className="action-menu-item"
@@ -43,12 +55,12 @@ export function ShipmentTile({ shipment, onSelect, toggleFlag, deleteShipment, c
               >
                 {shipment.isFlagged ? 'Unflag' : 'Flag'}
               </button>
-              {canDelete && (
+              {canDelete && onDeleteClick && (
                 <button
                   type="button"
                   className="action-menu-item"
                   onClick={() => {
-                    deleteShipment(shipment.id);
+                    onDeleteClick();
                     setMenuOpen(false);
                   }}
                 >

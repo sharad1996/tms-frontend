@@ -2,9 +2,22 @@ import React from 'react';
 
 import { classNames } from '../lib/classNames.js';
 
-export function ShipmentDetail({ shipment, clear, toggleFlag, canDelete, deleteShipment }) {
+export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, toggleFlag, isLoggedIn }) {
+  const requireLogin = (action) => {
+    if (!isLoggedIn) {
+      alert('Please log in (top right) to edit, flag, or delete shipments.');
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div className="detail-shell">
+      {!isLoggedIn && (
+        <p className="detail-login-hint">
+          Log in (top right) to edit, flag, or delete this shipment.
+        </p>
+      )}
       <div className="detail-header">
         <div className="detail-primary">
           <span className="detail-ref">{shipment.reference}</span>
@@ -26,36 +39,39 @@ export function ShipmentDetail({ shipment, clear, toggleFlag, canDelete, deleteS
             <span className="pill-soft">{shipment.serviceLevel} service</span>
           </div>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.35rem',
-            alignItems: 'flex-end',
-          }}
-        >
-          <button type="button" className="btn-ghost" onClick={clear}>
-            Back to list
-          </button>
-          <div style={{ display: 'flex', gap: '0.3rem' }}>
+        <div className="detail-actions-wrap">
+          <div className="detail-actions">
             <button
               type="button"
-              className="btn-ghost"
-              onClick={() => toggleFlag(shipment.id)}
-              style={{ borderColor: '#f97316', color: '#fed7aa' }}
+              className="btn-ghost btn-detail-action"
+              onClick={clear}
+            >
+              Back to list
+            </button>
+            <button
+              type="button"
+              className="btn-ghost btn-detail-action btn-edit"
+              onClick={() => !requireLogin('edit') && onEdit()}
+              title="Edit shipment"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              className="btn-ghost btn-detail-action btn-flag"
+              onClick={() => !requireLogin('flag') && toggleFlag(shipment.id)}
+              title={shipment.isFlagged ? 'Remove flag' : 'Flag shipment'}
             >
               {shipment.isFlagged ? 'Unflag' : 'Flag'}
             </button>
-            {canDelete && (
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => deleteShipment(shipment.id)}
-                style={{ borderColor: '#ef4444', color: '#fecaca' }}
-              >
-                Delete
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn-ghost btn-detail-action btn-delete"
+              onClick={() => !requireLogin('delete') && onDeleteClick()}
+              title="Delete shipment (admin only)"
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>

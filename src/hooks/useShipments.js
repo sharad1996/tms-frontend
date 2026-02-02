@@ -140,10 +140,6 @@ export function useShipments(token) {
   };
 
   const deleteShipment = async (shipmentId) => {
-    // eslint-disable-next-line no-alert
-    if (!window.confirm('Delete this shipment? This is only demo data but action cannot be undone.')) {
-      return;
-    }
     try {
       await gqlRequest(
         `mutation Delete($id: ID!) {
@@ -163,6 +159,51 @@ export function useShipments(token) {
     } catch (err) {
       // eslint-disable-next-line no-alert
       alert(err.message || 'Unable to delete shipment (admin only)');
+      throw err;
+    }
+  };
+
+  const updateShipment = async (shipmentId, input) => {
+    try {
+      const data = await gqlRequest(
+        `mutation UpdateShipment($id: ID!, $input: ShipmentUpdateInput!) {
+          updateShipment(id: $id, input: $input) {
+            id
+            reference
+            shipperName
+            carrierName
+            pickupLocation { city state country }
+            deliveryLocation { city state country }
+            pickupDate
+            deliveryDate
+            status
+            isFlagged
+            rate
+            currency
+            serviceLevel
+            trackingEvents {
+              timestamp
+              status
+              location { city state country }
+            }
+          }
+        }`,
+        { id: shipmentId, input },
+        token
+      );
+      const updated = data.updateShipment;
+      setState((s) => ({
+        ...s,
+        items: s.items.map((item) => (item.id === shipmentId ? updated : item)),
+      }));
+      if (selectedShipment && selectedShipment.id === shipmentId) {
+        setSelectedShipment(updated);
+      }
+      return updated;
+    } catch (err) {
+      // eslint-disable-next-line no-alert
+      alert(err.message || 'Unable to update shipment (check permissions)');
+      throw err;
     }
   };
 
@@ -177,6 +218,7 @@ export function useShipments(token) {
     setViewMode,
     toggleFlag,
     deleteShipment,
+    updateShipment,
   };
 }
 

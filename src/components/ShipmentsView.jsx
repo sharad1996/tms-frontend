@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { VIEW_MODE } from '../hooks/useShipments.js';
 import { classNames } from '../lib/classNames.js';
 import { ShipmentTile } from './ShipmentTile.jsx';
 import { ShipmentDetail } from './ShipmentDetail.jsx';
+import { EditShipmentModal } from './EditShipmentModal.jsx';
+import { DeleteConfirmModal } from './DeleteConfirmModal.jsx';
 
 export function ShipmentsView({ shipmentsHook, user }) {
   const {
@@ -17,7 +19,11 @@ export function ShipmentsView({ shipmentsHook, user }) {
     setViewMode,
     toggleFlag,
     deleteShipment,
+    updateShipment,
   } = shipmentsHook;
+
+  const [editingShipment, setEditingShipment] = useState(null);
+  const [shipmentToDelete, setShipmentToDelete] = useState(null);
 
   const onChangeFilter = (patch) => {
     setFilters((prev) => ({ ...prev, ...patch }));
@@ -28,6 +34,7 @@ export function ShipmentsView({ shipmentsHook, user }) {
   };
 
   const canDelete = user && user.role === 'ADMIN';
+  const canEdit = user && (user.role === 'ADMIN' || user.role === 'EMPLOYEE');
 
   return (
     <>
@@ -184,8 +191,9 @@ export function ShipmentsView({ shipmentsHook, user }) {
                     key={s.id}
                     shipment={s}
                     onSelect={() => setSelectedShipment(s)}
+                    onEdit={canEdit ? () => setEditingShipment(s) : undefined}
+                    onDeleteClick={canDelete ? () => setShipmentToDelete(s) : undefined}
                     toggleFlag={toggleFlag}
-                    deleteShipment={deleteShipment}
                     canDelete={canDelete}
                   />
                 ))}
@@ -233,9 +241,10 @@ export function ShipmentsView({ shipmentsHook, user }) {
               <ShipmentDetail
                 shipment={selectedShipment}
                 clear={() => setSelectedShipment(null)}
+                onEdit={() => setEditingShipment(selectedShipment)}
+                onDeleteClick={() => setShipmentToDelete(selectedShipment)}
                 toggleFlag={toggleFlag}
-                canDelete={canDelete}
-                deleteShipment={deleteShipment}
+                isLoggedIn={!!user}
               />
             ) : (
               <div className="empty-state">
@@ -254,6 +263,20 @@ export function ShipmentsView({ shipmentsHook, user }) {
         <div className="empty-state" style={{ color: '#f97316' }}>
           {state.error}
         </div>
+      )}
+      {editingShipment && (
+        <EditShipmentModal
+          shipment={editingShipment}
+          onSave={updateShipment}
+          onCancel={() => setEditingShipment(null)}
+        />
+      )}
+      {shipmentToDelete && (
+        <DeleteConfirmModal
+          shipment={shipmentToDelete}
+          onConfirm={deleteShipment}
+          onCancel={() => setShipmentToDelete(null)}
+        />
       )}
     </>
   );
