@@ -6,6 +6,7 @@ import { ShipmentTile } from './ShipmentTile.jsx';
 import { ShipmentDetail } from './ShipmentDetail.jsx';
 import { EditShipmentModal } from './EditShipmentModal.jsx';
 import { DeleteConfirmModal } from './DeleteConfirmModal.jsx';
+import { LoginRequiredModal } from './LoginRequiredModal.jsx';
 
 export function ShipmentsView({ shipmentsHook, user }) {
   const {
@@ -24,6 +25,7 @@ export function ShipmentsView({ shipmentsHook, user }) {
 
   const [editingShipment, setEditingShipment] = useState(null);
   const [shipmentToDelete, setShipmentToDelete] = useState(null);
+  const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
 
   const onChangeFilter = (patch) => {
     setFilters((prev) => ({ ...prev, ...patch }));
@@ -193,8 +195,10 @@ export function ShipmentsView({ shipmentsHook, user }) {
                     onSelect={() => setSelectedShipment(s)}
                     onEdit={canEdit ? () => setEditingShipment(s) : undefined}
                     onDeleteClick={canDelete ? () => setShipmentToDelete(s) : undefined}
+                    onLoginRequired={() => setShowLoginRequiredModal(true)}
                     toggleFlag={toggleFlag}
                     canDelete={canDelete}
+                    isLoggedIn={!!user}
                   />
                 ))}
                 {state.items.length === 0 && !state.loading && (
@@ -243,6 +247,7 @@ export function ShipmentsView({ shipmentsHook, user }) {
                 clear={() => setSelectedShipment(null)}
                 onEdit={() => setEditingShipment(selectedShipment)}
                 onDeleteClick={() => setShipmentToDelete(selectedShipment)}
+                onLoginRequired={() => setShowLoginRequiredModal(true)}
                 toggleFlag={toggleFlag}
                 isLoggedIn={!!user}
               />
@@ -277,6 +282,9 @@ export function ShipmentsView({ shipmentsHook, user }) {
           onConfirm={deleteShipment}
           onCancel={() => setShipmentToDelete(null)}
         />
+      )}
+      {showLoginRequiredModal && (
+        <LoginRequiredModal onClose={() => setShowLoginRequiredModal(false)} />
       )}
     </>
   );

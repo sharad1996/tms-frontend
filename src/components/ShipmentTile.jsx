@@ -2,10 +2,30 @@ import React, { useState } from 'react';
 
 import { classNames } from '../lib/classNames.js';
 
-export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, toggleFlag, canDelete }) {
+export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, onLoginRequired, toggleFlag, canDelete, isLoggedIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const stop = (e) => e.stopPropagation();
+
+  const handleEdit = () => {
+    if (!isLoggedIn) {
+      onLoginRequired?.();
+      setMenuOpen(false);
+      return;
+    }
+    onEdit?.();
+    setMenuOpen(false);
+  };
+
+  const handleFlag = () => {
+    if (!isLoggedIn) {
+      onLoginRequired?.();
+      setMenuOpen(false);
+      return;
+    }
+    toggleFlag(shipment.id);
+    setMenuOpen(false);
+  };
 
   return (
     <div className="tile" onClick={onSelect}>
@@ -37,10 +57,7 @@ export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, toggle
                 <button
                   type="button"
                   className="action-menu-item"
-                  onClick={() => {
-                    onEdit();
-                    setMenuOpen(false);
-                  }}
+                  onClick={handleEdit}
                 >
                   Edit
                 </button>
@@ -48,10 +65,7 @@ export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, toggle
               <button
                 type="button"
                 className="action-menu-item"
-                onClick={() => {
-                  toggleFlag(shipment.id);
-                  setMenuOpen(false);
-                }}
+                onClick={handleFlag}
               >
                 {shipment.isFlagged ? 'Unflag' : 'Flag'}
               </button>

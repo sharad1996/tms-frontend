@@ -2,10 +2,10 @@ import React from 'react';
 
 import { classNames } from '../lib/classNames.js';
 
-export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, toggleFlag, isLoggedIn }) {
-  const requireLogin = (action) => {
+export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, onLoginRequired, toggleFlag, isLoggedIn }) {
+  const requireLogin = () => {
     if (!isLoggedIn) {
-      alert('Please log in (top right) to edit, flag, or delete shipments.');
+      onLoginRequired();
       return true;
     }
     return false;
@@ -51,7 +51,7 @@ export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, toggleF
             <button
               type="button"
               className="btn-ghost btn-detail-action btn-edit"
-              onClick={() => !requireLogin('edit') && onEdit()}
+              onClick={() => !requireLogin() && onEdit()}
               title="Edit shipment"
             >
               Edit
@@ -59,7 +59,7 @@ export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, toggleF
             <button
               type="button"
               className="btn-ghost btn-detail-action btn-flag"
-              onClick={() => !requireLogin('flag') && toggleFlag(shipment.id)}
+              onClick={() => !requireLogin() && toggleFlag(shipment.id)}
               title={shipment.isFlagged ? 'Remove flag' : 'Flag shipment'}
             >
               {shipment.isFlagged ? 'Unflag' : 'Flag'}
@@ -67,7 +67,7 @@ export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, toggleF
             <button
               type="button"
               className="btn-ghost btn-detail-action btn-delete"
-              onClick={() => !requireLogin('delete') && onDeleteClick()}
+              onClick={() => !requireLogin() && onDeleteClick()}
               title="Delete shipment (admin only)"
             >
               Delete

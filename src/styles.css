@@ -980,6 +980,26 @@ tbody tr:hover {
   cursor: not-allowed;
 }
 
+/* Login required modal */
+.login-required-modal {
+  max-width: 380px;
+}
+
+.login-required-modal .modal-actions {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.login-required-body {
+  padding: 1rem 1.25rem 0.5rem;
+}
+
+.login-required-message {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #e5e7eb;
+}
+
 @media (max-width: 960px) {
   .layout-main {
     grid-template-columns: 1fr;
