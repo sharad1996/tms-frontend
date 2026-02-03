@@ -1,5 +1,5 @@
 const GRAPHQL_ENDPOINT =
-  import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql';
+  import.meta.env.VITE_GRAPHQL_URL || 'https://tms-bakend.onrender.com/graphql';
 
 export async function gqlRequest(query, variables = {}, token) {
   const res = await fetch(GRAPHQL_ENDPOINT, {
