@@ -50,7 +50,10 @@ export function TopBar({ activeTab, setActiveTab, auth }) {
             <span className={classNames('user-role', user.role === 'ADMIN' ? 'role-admin' : 'role-employee')}>
               {user.role}
             </span>
-            <button type="button" onClick={logout}>
+            <button type="button" onClick={() => {
+              logout();
+              window.location.reload();
+            }}>
               Sign out
             </button>
           </div>

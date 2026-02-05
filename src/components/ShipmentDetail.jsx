@@ -2,7 +2,7 @@ import React from 'react';
 
 import { classNames } from '../lib/classNames.js';
 
-export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, onLoginRequired, toggleFlag, isLoggedIn }) {
+export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, onLoginRequired, toggleFlag, isLoggedIn, canEdit, canDelete }) {
   const requireLogin = () => {
     if (!isLoggedIn) {
       onLoginRequired();
@@ -48,30 +48,39 @@ export function ShipmentDetail({ shipment, clear, onEdit, onDeleteClick, onLogin
             >
               Back to list
             </button>
-            <button
-              type="button"
-              className="btn-ghost btn-detail-action btn-edit"
-              onClick={() => !requireLogin() && onEdit()}
-              title="Edit shipment"
-            >
-              Edit
-            </button>
-            <button
-              type="button"
-              className="btn-ghost btn-detail-action btn-flag"
-              onClick={() => !requireLogin() && toggleFlag(shipment.id)}
-              title={shipment.isFlagged ? 'Remove flag' : 'Flag shipment'}
-            >
-              {shipment.isFlagged ? 'Unflag' : 'Flag'}
-            </button>
-            <button
-              type="button"
-              className="btn-ghost btn-detail-action btn-delete"
-              onClick={() => !requireLogin() && onDeleteClick()}
-              title="Delete shipment (admin only)"
-            >
-              Delete
-            </button>
+            {/* Edit button - visible if user has permission */}
+            {canEdit && (
+              <button
+                type="button"
+                className="btn-ghost btn-detail-action btn-edit"
+                onClick={() => !requireLogin() && onEdit()}
+                title="Edit shipment"
+              >
+                Edit
+              </button>
+            )}
+            {/* Flag button - visible for all logged-in users */}
+            {isLoggedIn && (
+              <button
+                type="button"
+                className="btn-ghost btn-detail-action btn-flag"
+                onClick={() => !requireLogin() && toggleFlag(shipment.id)}
+                title={shipment.isFlagged ? 'Remove flag' : 'Flag shipment'}
+              >
+                {shipment.isFlagged ? 'Unflag' : 'Flag'}
+              </button>
+            )}
+            {/* Delete button - visible only if user has permission (admin only) */}
+            {canDelete && (
+              <button
+                type="button"
+                className="btn-ghost btn-detail-action btn-delete"
+                onClick={() => !requireLogin() && onDeleteClick()}
+                title="Delete shipment (admin only)"
+              >
+                Delete
+              </button>
+            )}
           </div>
         </div>
       </div>

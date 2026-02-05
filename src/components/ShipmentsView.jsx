@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { VIEW_MODE } from '../hooks/useShipments.js';
+import { usePermissions } from '../hooks/usePermissions.js';
 import { classNames } from '../lib/classNames.js';
 import { ShipmentTile } from './ShipmentTile.jsx';
 import { ShipmentDetail } from './ShipmentDetail.jsx';
@@ -23,6 +24,8 @@ export function ShipmentsView({ shipmentsHook, user }) {
     updateShipment,
   } = shipmentsHook;
 
+  const { can: canPermission, isAdmin } = usePermissions(user);
+
   const [editingShipment, setEditingShipment] = useState(null);
   const [shipmentToDelete, setShipmentToDelete] = useState(null);
   const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
@@ -35,8 +38,10 @@ export function ShipmentsView({ shipmentsHook, user }) {
     fetchPage(nextPage);
   };
 
-  const canDelete = user && user.role === 'ADMIN';
-  const canEdit = user && (user.role === 'ADMIN' || user.role === 'EMPLOYEE');
+  // Use permission-based checks instead of role-based
+  const canDelete = canPermission('deleteShipment');
+  const canEdit = canPermission('updateShipment');
+  const canAdd = canPermission('addShipment');
 
   return (
     <>
@@ -132,6 +137,20 @@ export function ShipmentsView({ shipmentsHook, user }) {
               <span className="chip">
                 Page {state.page} of {state.totalPages}
               </span>
+              {/* Admin badge */}
+              {isAdmin() && (
+                <span
+                  className="chip"
+                  style={{
+                    backgroundColor: '#dbeafe',
+                    color: '#1e40af',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                  }}
+                >
+                  👨‍💼 Admin
+                </span>
+              )}
             </div>
           </div>
           <div className="panel-body">
@@ -245,11 +264,13 @@ export function ShipmentsView({ shipmentsHook, user }) {
               <ShipmentDetail
                 shipment={selectedShipment}
                 clear={() => setSelectedShipment(null)}
-                onEdit={() => setEditingShipment(selectedShipment)}
-                onDeleteClick={() => setShipmentToDelete(selectedShipment)}
+                onEdit={canEdit ? () => setEditingShipment(selectedShipment) : undefined}
+                onDeleteClick={canDelete ? () => setShipmentToDelete(selectedShipment) : undefined}
                 onLoginRequired={() => setShowLoginRequiredModal(true)}
                 toggleFlag={toggleFlag}
                 isLoggedIn={!!user}
+                canEdit={canEdit}
+                canDelete={canDelete}
               />
             ) : (
               <div className="empty-state">

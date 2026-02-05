@@ -9,7 +9,20 @@ export function useAuth() {
     if (!token) return;
     gqlRequest(
       `query Me {
-        me { id username role }
+        me { 
+          id 
+          username 
+          role 
+          permissions {
+            addShipment
+            updateShipment
+            deleteShipment
+            viewAllShipments
+            viewDetailedReports
+            manageUsers
+            flagShipment
+          }
+        }
       }`,
       {},
       token
@@ -33,6 +46,15 @@ export function useAuth() {
           username
           role
           token
+          permissions {
+            addShipment
+            updateShipment
+            deleteShipment
+            viewAllShipments
+            viewDetailedReports
+            manageUsers
+            flagShipment
+          }
         }
       }`,
       { username, password }
@@ -42,6 +64,7 @@ export function useAuth() {
       id: data.login.id,
       username: data.login.username,
       role: data.login.role,
+      permissions: data.login.permissions,
     });
     setToken(data.login.token);
     window.localStorage.setItem('tms_token', data.login.token);

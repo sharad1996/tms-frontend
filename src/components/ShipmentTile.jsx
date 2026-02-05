@@ -27,6 +27,16 @@ export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, onLogi
     setMenuOpen(false);
   };
 
+  const handleDelete = () => {
+    if (!isLoggedIn) {
+      onLoginRequired?.();
+      setMenuOpen(false);
+      return;
+    }
+    onDeleteClick?.();
+    setMenuOpen(false);
+  };
+
   return (
     <div className="tile" onClick={onSelect}>
       <div className="tile-header">
@@ -53,6 +63,7 @@ export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, onLogi
               >
                 View details
               </button>
+              {/* Edit option - shown if user has permission */}
               {onEdit && (
                 <button
                   type="button"
@@ -62,21 +73,22 @@ export function ShipmentTile({ shipment, onSelect, onEdit, onDeleteClick, onLogi
                   Edit
                 </button>
               )}
-              <button
-                type="button"
-                className="action-menu-item"
-                onClick={handleFlag}
-              >
-                {shipment.isFlagged ? 'Unflag' : 'Flag'}
-              </button>
+              {/* Flag option - available for logged-in users */}
+              {isLoggedIn && (
+                <button
+                  type="button"
+                  className="action-menu-item"
+                  onClick={handleFlag}
+                >
+                  {shipment.isFlagged ? 'Unflag' : 'Flag'}
+                </button>
+              )}
+              {/* Delete option - shown only if user has permission */}
               {canDelete && onDeleteClick && (
                 <button
                   type="button"
                   className="action-menu-item"
-                  onClick={() => {
-                    onDeleteClick();
-                    setMenuOpen(false);
-                  }}
+                  onClick={handleDelete}
                 >
                   Delete
                 </button>
