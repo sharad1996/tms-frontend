@@ -1,17 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function classNames(...parts) {
   return parts.filter(Boolean).join(' ');
 }
 
 export function TopBar({ activeTab, setActiveTab, auth }) {
-  const { user, loginAs, logout } = auth;
+  const { user, logout } = auth;
+  const navigate = useNavigate();
 
-  const handleQuickLogin = async (e) => {
-    const value = e.target.value;
-    if (!value) return;
-    await loginAs(value);
-    e.target.value = '';
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -20,7 +20,7 @@ export function TopBar({ activeTab, setActiveTab, auth }) {
         <div className="brand-logo">
           <div className="brand-logo-inner" />
         </div>
-        <div className="brand-text">NovaTMS</div>
+        <div className="brand-text">TMS</div>
       </div>
       <nav className="top-menu">
         {['Dashboard', 'Shipments', 'Network', 'Insights'].map((item) => (
@@ -34,26 +34,13 @@ export function TopBar({ activeTab, setActiveTab, auth }) {
         ))}
       </nav>
       <div className="login-bar">
-        {!user && (
-          <>
-            <select defaultValue="" onChange={handleQuickLogin}>
-              <option value="">Login as...</option>
-              <option value="admin">Admin</option>
-              <option value="employee">Employee</option>
-            </select>
-            <span className="login-hint">admin/admin123, employee/employee123</span>
-          </>
-        )}
         {user && (
           <div className="user-pill">
             <span>{user.username}</span>
             <span className={classNames('user-role', user.role === 'ADMIN' ? 'role-admin' : 'role-employee')}>
               {user.role}
             </span>
-            <button type="button" onClick={() => {
-              logout();
-              window.location.reload();
-            }}>
+            <button type="button" onClick={handleLogout}>
               Sign out
             </button>
           </div>

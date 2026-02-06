@@ -4,9 +4,15 @@ import { gqlRequest } from '../lib/graphql.js';
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => window.localStorage.getItem('tms_token') || '');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
     gqlRequest(
       `query Me {
         me { 
@@ -29,11 +35,13 @@ export function useAuth() {
     )
       .then((data) => {
         setUser(data.me);
+        setLoading(false);
       })
       .catch(() => {
         setToken('');
         setUser(null);
         window.localStorage.removeItem('tms_token');
+        setLoading(false);
       });
   }, [token]);
 
@@ -76,6 +84,6 @@ export function useAuth() {
     window.localStorage.removeItem('tms_token');
   };
 
-  return { user, token, loginAs, logout };
+  return { user, token, loginAs, logout, loading };
 }
 
